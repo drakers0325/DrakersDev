@@ -34,7 +34,7 @@ namespace DrakersDev.Evaluation
         private static readonly Char[] operators = new char[] { '+', '-', '*', '/' };
 
         #region 공식 파싱
-        private IEnumerable<FormulaToken> Parse(String expression, IVariableTokenFactory variableFactory)
+        private static IEnumerable<FormulaToken> Parse(String expression, IVariableTokenFactory variableFactory)
         {
             var sb = new StringBuilder();
             for (Int32 index = 0; index < expression.Length; index++)
@@ -103,11 +103,19 @@ namespace DrakersDev.Evaluation
                     break;
                 }
             }
+            if (parenthesisCount > 0)
+            {
+                throw new ApplicationException("공식의 괄호에 문제가 있습니다");
+            }
             readCount = count;
         }
 
         private static FormulaToken CreateNumerOrVariableToken(String expression, IVariableTokenFactory variableFactory)
         {
+            if (expression[0] == ')')
+            {
+                throw new ApplicationException("공식의 괄호에 문제가 있습니다");
+            }
             var numToken = CreateNumericToken(expression);
             return numToken != null ?
                 numToken : variableFactory.CreateVariableToken(expression);

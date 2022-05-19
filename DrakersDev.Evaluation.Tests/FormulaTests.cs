@@ -123,8 +123,10 @@ namespace DrakersDev.Evaluation.Tests
 
         private static void CheckCalculateResult(String expression, Double[] results, EvaluationAlignment evalAlign, params Variable[] vars)
         {
-            var formula = new Formula(expression);
-            formula.EvaluationAlignment = evalAlign;
+            var formula = new Formula(expression)
+            {
+                EvaluationAlignment = evalAlign
+            };
             foreach (var eachVar in vars)
             {
                 formula.SetVariableValues(eachVar.Name, eachVar.Values);
@@ -237,6 +239,16 @@ namespace DrakersDev.Evaluation.Tests
                 .Where(v => v.TokenType == TokenType.Variable && ((VariableToken)v).VariableName.Equals("테스트변수"))
                 .First();
             var2Token.Values.Should().Equal(values);
+        }
+
+        [Theory]
+        [InlineData("1 *(2+3")]
+        [InlineData("1 *(2+3))/4")]
+        public void Throw_When_Parentheses_Do_Not_Exist_In_Pair(String exp)
+        {
+            var exAction = () => new Formula(exp);
+            exAction.Should().Throw<ApplicationException>().WithMessage("공식의 괄호에 문제가 있습니다");
+
         }
     }
 }
